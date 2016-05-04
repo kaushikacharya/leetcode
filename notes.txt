@@ -1,0 +1,8 @@
+Largest rectangle in histogram:
+
+http://community.topcoder.com/tc?module=Static&d1=tutorials&d2=lowestCommonAncestor
+Used:
+O(n): preprocessing time
+O(log n): query time
+
+Can be further optimized.
