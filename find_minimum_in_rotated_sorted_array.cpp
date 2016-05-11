@@ -48,7 +48,7 @@ public:
 
 int main(int argc, char* argv[])
 {
-    int arr[] = {4,5,6,7,0,2};
+    int arr[] = {3,1};
     vector<int> vec(arr, arr+sizeof(arr)/sizeof(arr[0]));
     Solution sln;
     int min_val = sln.findMin(vec);
