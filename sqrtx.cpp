@@ -9,10 +9,32 @@ class Solution {
 public:
     int mySqrt(int x)
     {
-        if (x == 0)
+        if (x <= 1)
         {
-            return 0;
+            return x;
         }
+
+        int p = 0;
+        int q = x;
+        int res = x;
+        while (true)
+        {
+            p = (p+q)/2;
+            q = x/p;
+
+            int min_pq = min(p,q);
+            if (min_pq == res)
+            {
+                break;
+            }
+            else
+            {
+                res = min_pq;
+            }
+        }
+
+        return res;
+        /*
         int p = 1;
         int q = x;
 
@@ -37,6 +59,7 @@ public:
         }
 
         return p;
+        */
     }
 };
 
@@ -50,5 +73,9 @@ int main(int argc, char* argv[])
 }
 
 /*
-Status: Time Limit Exceeded
+https://leetcode.com/discuss/72319/very-easy-java-method-using-binary-search-with-explanation
+My initial attempt should have been like this.
+
+https://en.wikipedia.org/wiki/Integer_square_root
+https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method
 */

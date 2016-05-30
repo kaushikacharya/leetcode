@@ -73,6 +73,7 @@ int main(int argc, char* argv[])
     int n = 100;
     Solution sln;
     long num_unique_paths = sln.uniquePaths(m,n);
+    cout << "Unique Paths: " << num_unique_paths << endl;
     return 0;
 }
 
