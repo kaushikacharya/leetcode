@@ -22,6 +22,36 @@ public:
         {
             return;
         }
+
+        TreeLinkNode* curLevelStart = root; // This will have the left most node at each level of the tree.
+        while (curLevelStart->left)
+        {
+            TreeLinkNode* curLevelNode = curLevelStart;
+            TreeLinkNode* nextLevelNode = NULL;
+            while (curLevelNode)
+            {
+                if (nextLevelNode)
+                {
+                    nextLevelNode->next = curLevelNode->left;
+                }
+                nextLevelNode = curLevelNode->left;
+                nextLevelNode->next = curLevelNode->right;
+                nextLevelNode = curLevelNode->right;
+                curLevelNode = curLevelNode->next;
+            }
+            // Now step down to next level
+            curLevelStart = curLevelStart->left;
+        }
+    }
+
+    // Though the solution has been accepted but it violates memory constraint.
+    // Method: BFS traversal
+    void connect_using_queue(TreeLinkNode *root)
+    {
+        if (root == NULL)
+        {
+            return;
+        }
         int prevLevel = -1;
         TreeLinkNode* prevNode = NULL;
         queue<pair<TreeLinkNode*,int> > q;
@@ -106,6 +136,8 @@ int main(int argc, char* argv[])
 }
 
 /*
+    EDIT: Now have implemented solution using O(1) space.
+
     Though my solution has been accepted, but using queue violates the constraint "You may only use constant extra space."
     Have a look at this solution: https://leetcode.com/discuss/102338/java-solution-traversing-by-level-without-extra-space
 */
