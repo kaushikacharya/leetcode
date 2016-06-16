@@ -72,7 +72,6 @@ int main(int argc, char* argv[])
 }
 
 /**
-* Status: Wrong answer :: Need to remove duplicate from the array
 *
 * Explanation of question:
 *   https://leetcode.com/discuss/76421/weird-answer-why-the-expected-answer-an-array-not-an-integer
