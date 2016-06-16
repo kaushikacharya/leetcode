@@ -15,41 +15,59 @@ public:
             return 0;
         }
 
-        int final_count = 0;
+        int max_occurrence_allowed = 2;
+        int final_length = 1;
+        int shift = 0;
+        int prevNum = nums[0];
+        int prevCount = 1; // Keeps count of occurrence of previous number
 
-        int prevElem = nums[0];
-        int prevCount = 1;
-
-        for (vector<int>::iterator it = nums.begin()+1; it != nums.end(); ++it)
+        for (int i=1; i != nums.size(); ++i)
         {
-            int curElem = *it;
+            int curNum = nums[i];
 
-            if (prevElem == curElem)
+            // bool is_additional_duplicates = false;
+
+            if (prevNum == curNum)
             {
                 ++prevCount;
             }
             else
             {
-                final_count += min(2,prevCount);
-                // reset prev*
-                prevElem = curElem;
                 prevCount = 1;
             }
+
+            if (prevCount > max_occurrence_allowed)
+            {
+                ++shift;
+            }
+            else
+            {
+                ++final_length;
+
+                if (shift > 0)
+                {
+                    nums[i-shift] = curNum;
+                }
+            }
+
+            prevNum = curNum;
         }
 
-        // include count for final element
-        final_count += min(2,prevCount);
-
-        return final_count;
+        return final_length;
     }
 };
 
 int main(int argc, char* argv[])
 {
-    vector<int> nums = {1,1,1,2};
+    vector<int> nums = {1,1,1,2,2,3,3,3,4};
     Solution sln;
     int count_post_duplicate_removal = sln.removeDuplicates(nums);
     cout << "count post duplicate removal: " << count_post_duplicate_removal << endl;
+    for (int i=0; i != count_post_duplicate_removal; ++i)
+    {
+        cout << nums[i] << ",";
+    }
+    cout << endl;
     return 0;
 }
 
