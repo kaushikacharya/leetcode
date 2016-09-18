@@ -6,6 +6,7 @@
 #include <vector>
 #include <set>
 #include <unordered_map>
+#include <cassert>
 
 using namespace std;
 
@@ -13,155 +14,221 @@ class Solution {
 public:
     vector<string> findItinerary(vector<pair<string, string>> tickets)
     {
-        sort_and_create_map(tickets);
-        create_adjacency_matrix(tickets);
-        // print_adjacency_matrix();
+        srcAirport_ = "JFK";
+        populate_edges(tickets);
+        populate_adjacency_list_in_lexicographic_order();
+        // print_adjacency_list();
 
-        string st_airport =  "JFK";
-        unordered_map<string, int>::iterator mapIt = mapAirportToIndex_.find(st_airport);
-        int st_airport_index = (*mapIt).second;
+        // cout << "\ntraversal:\n" << endl;
+        vector<int> vecIndexItineraryEdge;
+        find_itinerary_backtracking(vecIndexItineraryEdge);
+        // cout << "size(vecIndexItineraryEdge) after traversal: " << vecIndexItineraryEdge.size() << endl;
 
-        vector<int> vecItineraryIndex;
-        vecItineraryIndex.push_back(st_airport_index);
-        int final_size = tickets.size() + 1;
-        find_itinerary_backtracking(vecItineraryIndex, st_airport_index, final_size);
-
+        // Now collect the airports
         vector<string> vecItinerary;
-        for (vector<int>::iterator it = vecItineraryIndex.begin(); it != vecItineraryIndex.end(); ++it)
+        vecItinerary.push_back(vecEdge_[vecIndexItineraryEdge.front()].from);
+
+        for (vector<int>::iterator it = vecIndexItineraryEdge.begin(); it != vecIndexItineraryEdge.end(); ++it)
         {
-            vecItinerary.push_back(vecAirportSorted_[*it]);
+            vecItinerary.push_back(vecEdge_[*it].to);
         }
 
         return vecItinerary;
     }
 private:
-    void sort_and_create_map(vector<pair<string, string>> tickets)
+    void populate_edges(vector<pair<string, string> > tickets)
     {
-        // Collect the set of airports
-        set<string> airports;
-        for (vector<pair<string, string>>::iterator it = tickets.begin(); it != tickets.end(); ++it)
+        for (vector<pair<string, string> >::iterator it = tickets.begin(); it != tickets.end(); ++it)
         {
-            airports.insert((*it).first);
-            airports.insert((*it).second);
+            string fromAirport = (*it).first;
+            string toAirport = (*it).second;
+            Edge edge(fromAirport, toAirport);
+
+            edgeToIndexMap_.insert(make_pair(edge,vecEdge_.size()));
+            vecEdge_.push_back(edge);
+            vecVisited_.push_back(false);
+        }
+    }
+
+    /*
+    bool cmp(int i, int j)
+    {
+        return i < j;
+        // return (vecEdge_[i].to < vecEdge_[j].to);
+    }
+    */
+
+    void populate_adjacency_list_in_lexicographic_order()
+    {
+        assert((vecEdge_.size() > 0) && "populate edges before calling populate_adjacency_list()\n");
+
+        // initialize empty adjacency list
+        for (int i = 0; i != vecEdge_.size(); ++i)
+        {
+            adjMatrix_.push_back(vector<Edge>());
         }
 
+        // TBD: use unordered_map to reduce time complexity from O(n^2)
+        for (int i = 0; i != vecEdge_.size(); ++i)
         {
-            set<string>::iterator it;
-            int i;
-            for (it = airports.begin(), i = 0; it != airports.end(); ++it, ++i)
+            for (int j = 0; j != vecEdge_.size(); ++j)
             {
-                string airport = (*it);
-                mapAirportToIndex_.insert(make_pair(airport, i));
-                vecAirportSorted_.push_back(airport);
+                if (i == j)
+                {
+                    continue;
+                }
+
+                if (vecEdge_[i].to == vecEdge_[j].from)
+                {
+                    adjMatrix_[i].push_back(vecEdge_[j]);
+                }
             }
         }
 
-        /*
-        for (set<string>::iterator it = airports.begin(); it != airports.end(); ++it)
+        // now sort each of the adjacency list
+        for (int i = 0; i != vecEdge_.size(); ++i)
         {
-            unordered_map<string, int>::iterator map_it = mapAirportToIndex_.find(*it);
-            cout << *it << " : " << map_it->second << endl;
-        }
-        */
-
-    }
-
-    void create_adjacency_matrix(vector<pair<string, string> > tickets)
-    {
-        // initialize empty vectors
-        for (int i = 0; i != vecAirportSorted_.size(); ++i)
-        {
-            adjMatrix_.push_back(vector<int>());
-            vecPosNext_.push_back(0);
-        }
-
-        for (vector<pair<string, string> >::iterator tIt = tickets.begin(); tIt != tickets.end(); ++tIt)
-        {
-            string fromAirport = (*tIt).first;
-            string toAirport = (*tIt).second;
-            unordered_map<string, int>::iterator mapIt = mapAirportToIndex_.find(fromAirport);
-            int fromAirportIndex = (*mapIt).second;
-            mapIt = mapAirportToIndex_.find(toAirport);
-            int toAirportIndex = (*mapIt).second;
-
-            adjMatrix_[fromAirportIndex].push_back(toAirportIndex);
-        }
-
-        // sort each rows of the adjacent matrix
-        for (vector<vector<int> >::iterator it = adjMatrix_.begin(); it != adjMatrix_.end(); ++it)
-        {
-            sort((*it).begin(), (*it).end());
+            sort(adjMatrix_[i].begin(), adjMatrix_[i].end(), cmp());
         }
     }
 
-    void print_adjacency_matrix()
+    void print_adjacency_list()
     {
-        for (int row = 0; row != vecAirportSorted_.size(); ++row)
+        cout << "n edges: " << vecEdge_.size() << endl;
+        for (int i = 0; i != vecEdge_.size(); ++i)
         {
-            cout << vecAirportSorted_[row] << " : ";
-            for (vector<int>::iterator it = adjMatrix_[row].begin(); it != adjMatrix_[row].end(); ++it)
+            cout << i << " : " << vecEdge_[i].from << "->" << vecEdge_[i].to << " : ";
+            for (int j = 0; j != adjMatrix_[i].size(); ++j)
             {
-                cout << vecAirportSorted_[*it] << ",";
+                // cout << vecEdge_[adjMatrix_[i][j]].from << "->" << vecEdge_[adjMatrix_[i][j]].to << ", ";
+                cout << adjMatrix_[i][j].from << "->" << adjMatrix_[i][j].to << ", ";
             }
             cout << endl;
         }
     }
 
-    void find_itinerary_backtracking(vector<int>& vecItinerary, int curFromAirport, int final_size)
+    void find_itinerary_backtracking(vector<int>& vecIndexItineraryEdge)
     {
-        // cout << "entering with fromAirport: " << curFromAirport << " : " << vecAirportSorted_[curFromAirport] <<
-        // " :: size(vecItinerary): " << vecItinerary.size() << " :: next pos: " << vecPosNext_[curFromAirport] << endl;
-
-        if (vecItinerary.size() == final_size)
+        // cout << "size(vecIndexItineraryEdge): " << vecIndexItineraryEdge.size() << endl;
+        if (vecIndexItineraryEdge.size() == vecEdge_.size())
         {
-            // cout << "itenary found" << endl;
             return;
         }
 
-        for (int childIndex = vecPosNext_[curFromAirport]; childIndex != adjMatrix_[curFromAirport].size(); ++childIndex)
+        // get the next edges
+        vector<int> vec_index_child_edge;
+
+        if (vecIndexItineraryEdge.empty())
         {
-            int nextAirport = adjMatrix_[curFromAirport][childIndex];
-
-            vecItinerary.push_back(nextAirport);
-            ++vecPosNext_[curFromAirport];
-
-            find_itinerary_backtracking(vecItinerary, nextAirport, final_size);
-            // cout << "after return from func: " << "curFromAirport: " << curFromAirport << " : " << vecAirportSorted_[curFromAirport] << endl;
-
-            if (vecItinerary.size() == final_size)
+            // collect the edges having "to" as source airport in sorted order
+            vector<Edge> vec_child_edge;
+            for (int i=0; i != vecEdge_.size(); ++i)
             {
-                return;
+                if (vecEdge_[i].from == srcAirport_)
+                {
+                    vec_child_edge.push_back(vecEdge_[i]);
+                    // vec_index_child_edge.push_back(i);
+                }
             }
 
-            vecItinerary.pop_back();
+            sort(vec_child_edge.begin(), vec_child_edge.end(), cmp());
+
+            for (vector<Edge>::iterator it = vec_child_edge.begin(); it != vec_child_edge.end(); ++it)
+            {
+                unordered_map<Edge,int,EdgeHash,EdgeEqual>::iterator mapIt = edgeToIndexMap_.find(*it);
+                vec_index_child_edge.push_back((*mapIt).second);
+            }
+        }
+        else
+        {
+            int last_edge_index = vecIndexItineraryEdge.back();
+
+            for (vector<Edge>::iterator it = adjMatrix_[last_edge_index].begin(); it != adjMatrix_[last_edge_index].end(); ++it)
+            {
+                unordered_map<Edge,int,EdgeHash,EdgeEqual>::iterator mapIt = edgeToIndexMap_.find(*it);
+                vec_index_child_edge.push_back((*mapIt).second);
+            }
         }
 
-        // expanding curFromAirport didn't worked in finding the path. Hence backtracking
-        // cout << "expanding didn't worked: " << "curFromAirport: " << curFromAirport << " : " << vecAirportSorted_[curFromAirport] << endl;
-        vecPosNext_[curFromAirport] = 0;
-        vecItinerary.pop_back();
-    }
+        for (vector<int>::iterator it = vec_index_child_edge.begin(); it != vec_index_child_edge.end(); ++it)
+        {
+            int child_index_edge = *it;
+            if (!vecVisited_[child_index_edge])
+            {
+                // cout << child_index_edge << " : " << vecEdge_[child_index_edge].from << "->" << vecEdge_[child_index_edge].to << endl;
+                vecVisited_[child_index_edge] = true;
+                vecIndexItineraryEdge.push_back(child_index_edge);
+                find_itinerary_backtracking(vecIndexItineraryEdge);
+            }
+        }
 
+        // backtrack
+        if (!vecIndexItineraryEdge.empty() && (vecIndexItineraryEdge.size() < vecEdge_.size()))
+        {
+            int last_edge_index = vecIndexItineraryEdge.back();
+            vecIndexItineraryEdge.pop_back();
+            vecVisited_[last_edge_index] = false;
+        }
+    }
 private:
-    vector<vector<int> > adjMatrix_;
-    vector<string> vecAirportSorted_;
-    unordered_map<string, int> mapAirportToIndex_;
-    vector<int> vecPosNext_; // for each row of the adjacency matrix, this represents the next "to" airport to explore
+    struct Edge
+    {
+        string from;
+        string to;
+
+        Edge(string fromAirport, string toAirport)
+        : from(fromAirport)
+        , to(toAirport)
+        {
+        }
+    };
+
+    struct EdgeHash
+    {
+        size_t operator()(const Edge& e) const
+        {
+            return hash<string>()(e.from) ^ (hash<string>()(e.to) << 1);
+        }
+    };
+
+    struct EdgeEqual
+    {
+        bool operator()(const Edge& lhs, const Edge& rhs) const
+        {
+            return lhs.from == rhs.from && lhs.to == rhs.to;
+        }
+    };
+
+    struct cmp
+    {
+        bool operator()(const Edge& edgeA, const Edge& edgeB)
+        {
+            return (edgeA.to < edgeB.to);
+        }
+    };
+private:
+    string srcAirport_;
+    vector<Edge> vecEdge_;
+    vector<bool> vecVisited_;
+    vector<vector<Edge> > adjMatrix_;
+    unordered_map<Edge,int, EdgeHash, EdgeEqual> edgeToIndexMap_; // maps Edge to index in vecEdge_
 };
 
 int main(int argc, char** argv)
 {
     vector<pair<string, string>> tickets;
     /*
-    tickets.push_back(make_pair("JFK","BFO"));
+    tickets.push_back(make_pair("JFK","SFO"));
     tickets.push_back(make_pair("JFK","ATL"));
-    tickets.push_back(make_pair("BFO","ATL"));
+    tickets.push_back(make_pair("SFO","ATL"));
     tickets.push_back(make_pair("ATL","JFK"));
-    tickets.push_back(make_pair("ATL","BFO"));
+    tickets.push_back(make_pair("ATL","SFO"));
     */
+
     tickets.push_back(make_pair("JFK","KUL"));
     tickets.push_back(make_pair("JFK","NRT"));
     tickets.push_back(make_pair("NRT","JFK"));
+    tickets.push_back(make_pair("KUL","BRP"));
 
     Solution sln;
     vector<string> vecItinerary = sln.findItinerary(tickets);
@@ -173,7 +240,13 @@ int main(int argc, char** argv)
 }
 
 /*
-Status: Run time error
-TBD: Change approach: consider edges as nodes of graph
+Status: wrong answer
+Had faced similar issue (comparison functor can't access the variables in the class under which it is nested)
+    http://stackoverflow.com/questions/27101829/c-invalid-use-of-non-static-data-member
+
+http://stackoverflow.com/questions/17016175/c-unordered-map-using-a-custom-class-type-as-the-key
+
+http://stackoverflow.com/questions/20049829/how-to-calculate-time-complexity-of-backtracking-algorithm
+http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp
 */
 
