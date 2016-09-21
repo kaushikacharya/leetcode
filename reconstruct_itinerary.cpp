@@ -44,19 +44,22 @@ private:
             string toAirport = (*it).second;
             Edge edge(fromAirport, toAirport);
 
-            edgeToIndexMap_.insert(make_pair(edge,vecEdge_.size()));
+            /*
+            unordered_map<Edge,int,EdgeHash,EdgeEqual>::iterator mapIt = edgeToIndexMap_.find(edge);
+            if (mapIt == edgeToIndexMap_.end())
+            {
+                vector<int> vecIndexEdge = {vecEdge_.size()};
+                edgeToIndexMap_.insert(make_pair(edge,vecIndexEdge));
+            }
+            else
+            {
+                (*mapIt).second.push_back(vecEdge_.size());
+            }
+            */
             vecEdge_.push_back(edge);
             vecVisited_.push_back(false);
         }
     }
-
-    /*
-    bool cmp(int i, int j)
-    {
-        return i < j;
-        // return (vecEdge_[i].to < vecEdge_[j].to);
-    }
-    */
 
     void populate_adjacency_list_in_lexicographic_order()
     {
@@ -65,12 +68,14 @@ private:
         // initialize empty adjacency list
         for (int i = 0; i != vecEdge_.size(); ++i)
         {
-            adjMatrix_.push_back(vector<Edge>());
+            adjList_.push_back(vector<int>());
+            // adjMatrix_.push_back(vector<Edge>());
         }
 
         // TBD: use unordered_map to reduce time complexity from O(n^2)
         for (int i = 0; i != vecEdge_.size(); ++i)
         {
+            vector<pair<Edge,int> > vecAdjEdge;
             for (int j = 0; j != vecEdge_.size(); ++j)
             {
                 if (i == j)
@@ -80,15 +85,18 @@ private:
 
                 if (vecEdge_[i].to == vecEdge_[j].from)
                 {
-                    adjMatrix_[i].push_back(vecEdge_[j]);
+                    vecAdjEdge.push_back(make_pair(vecEdge_[j],j));
+                    // adjMatrix_[i].push_back(vecEdge_[j]);
                 }
             }
-        }
 
-        // now sort each of the adjacency list
-        for (int i = 0; i != vecEdge_.size(); ++i)
-        {
-            sort(adjMatrix_[i].begin(), adjMatrix_[i].end(), cmp());
+            // sort the adjacent list of i'th edge
+            sort(vecAdjEdge.begin(), vecAdjEdge.end(), cmp());
+            // populate this sorted adjacent list
+            for (vector<pair<Edge,int> >::iterator it = vecAdjEdge.begin(); it != vecAdjEdge.end(); ++it)
+            {
+                adjList_[i].push_back((*it).second);
+            }
         }
     }
 
@@ -98,10 +106,16 @@ private:
         for (int i = 0; i != vecEdge_.size(); ++i)
         {
             cout << i << " : " << vecEdge_[i].from << "->" << vecEdge_[i].to << " : ";
+            /*
             for (int j = 0; j != adjMatrix_[i].size(); ++j)
             {
                 // cout << vecEdge_[adjMatrix_[i][j]].from << "->" << vecEdge_[adjMatrix_[i][j]].to << ", ";
                 cout << adjMatrix_[i][j].from << "->" << adjMatrix_[i][j].to << ", ";
+            }
+            */
+            for (int j = 0; j != adjList_[i].size(); ++j)
+            {
+                cout << vecEdge_[adjList_[i][j]].from << "->" << vecEdge_[adjList_[i][j]].to << ", ";
             }
             cout << endl;
         }
@@ -120,33 +134,32 @@ private:
 
         if (vecIndexItineraryEdge.empty())
         {
-            // collect the edges having "to" as source airport in sorted order
-            vector<Edge> vec_child_edge;
+            // collect the edges having "to" of parent airport as source airport in sorted order
+            vector<pair<Edge,int> > vec_child_edge;
             for (int i=0; i != vecEdge_.size(); ++i)
             {
                 if (vecEdge_[i].from == srcAirport_)
                 {
-                    vec_child_edge.push_back(vecEdge_[i]);
-                    // vec_index_child_edge.push_back(i);
+                    vec_child_edge.push_back(make_pair(vecEdge_[i],i));
                 }
             }
 
             sort(vec_child_edge.begin(), vec_child_edge.end(), cmp());
 
-            for (vector<Edge>::iterator it = vec_child_edge.begin(); it != vec_child_edge.end(); ++it)
+            for (vector<pair<Edge,int> >::iterator it = vec_child_edge.begin(); it != vec_child_edge.end(); ++it)
             {
-                unordered_map<Edge,int,EdgeHash,EdgeEqual>::iterator mapIt = edgeToIndexMap_.find(*it);
-                vec_index_child_edge.push_back((*mapIt).second);
+                // unordered_map<Edge,int,EdgeHash,EdgeEqual>::iterator mapIt = edgeToIndexMap_.find(*it);
+                // vec_index_child_edge.push_back((*mapIt).second);
+                vec_index_child_edge.push_back((*it).second);
             }
         }
         else
         {
             int last_edge_index = vecIndexItineraryEdge.back();
 
-            for (vector<Edge>::iterator it = adjMatrix_[last_edge_index].begin(); it != adjMatrix_[last_edge_index].end(); ++it)
+            for (vector<int>::iterator it = adjList_[last_edge_index].begin(); it != adjList_[last_edge_index].end(); ++it)
             {
-                unordered_map<Edge,int,EdgeHash,EdgeEqual>::iterator mapIt = edgeToIndexMap_.find(*it);
-                vec_index_child_edge.push_back((*mapIt).second);
+                vec_index_child_edge.push_back(*it);
             }
         }
 
@@ -182,7 +195,7 @@ private:
         {
         }
     };
-
+    /*
     struct EdgeHash
     {
         size_t operator()(const Edge& e) const
@@ -198,37 +211,70 @@ private:
             return lhs.from == rhs.from && lhs.to == rhs.to;
         }
     };
-
+    */
     struct cmp
     {
+        /*
         bool operator()(const Edge& edgeA, const Edge& edgeB)
         {
             return (edgeA.to < edgeB.to);
+        }
+        */
+        bool operator()(const pair<Edge,int>& edgeA, const pair<Edge,int>& edgeB)
+        {
+            return (edgeA.first.to < edgeB.first.to);
         }
     };
 private:
     string srcAirport_;
     vector<Edge> vecEdge_;
     vector<bool> vecVisited_;
-    vector<vector<Edge> > adjMatrix_;
-    unordered_map<Edge,int, EdgeHash, EdgeEqual> edgeToIndexMap_; // maps Edge to index in vecEdge_
+    // vector<vector<Edge> > adjMatrix_;
+    vector<vector<int> > adjList_;
+    // unordered_map<Edge, vector<int>, EdgeHash, EdgeEqual> edgeToIndexMap_; // maps Edge to index in vecEdge_
 };
 
 int main(int argc, char** argv)
 {
     vector<pair<string, string>> tickets;
-    /*
-    tickets.push_back(make_pair("JFK","SFO"));
-    tickets.push_back(make_pair("JFK","ATL"));
-    tickets.push_back(make_pair("SFO","ATL"));
-    tickets.push_back(make_pair("ATL","JFK"));
-    tickets.push_back(make_pair("ATL","SFO"));
-    */
-
-    tickets.push_back(make_pair("JFK","KUL"));
-    tickets.push_back(make_pair("JFK","NRT"));
-    tickets.push_back(make_pair("NRT","JFK"));
-    tickets.push_back(make_pair("KUL","BRP"));
+    int test_case = 2;
+    switch (test_case)
+        {
+            case 0:
+                {
+                    tickets.push_back(make_pair("JFK","SFO"));
+                    tickets.push_back(make_pair("JFK","ATL"));
+                    tickets.push_back(make_pair("SFO","ATL"));
+                    tickets.push_back(make_pair("ATL","JFK"));
+                    tickets.push_back(make_pair("ATL","SFO"));
+                    break;
+                }
+            case 1:
+                {
+                    tickets.push_back(make_pair("JFK","KUL"));
+                    tickets.push_back(make_pair("JFK","NRT"));
+                    tickets.push_back(make_pair("NRT","JFK"));
+                    tickets.push_back(make_pair("KUL","BRP"));
+                    break;
+                }
+            case 2:
+                {
+                    // [["EZE","AXA"],["TIA","ANU"],["ANU","JFK"],["JFK","ANU"],["ANU","EZE"],["TIA","ANU"],["AXA","TIA"],["TIA","JFK"],["ANU","TIA"],["JFK","TIA"]]
+                    tickets.push_back(make_pair("EZE","AXA"));
+                    tickets.push_back(make_pair("TIA","ANU"));
+                    tickets.push_back(make_pair("ANU","JFK"));
+                    tickets.push_back(make_pair("JFK","ANU"));
+                    tickets.push_back(make_pair("ANU","EZE"));
+                    tickets.push_back(make_pair("TIA","ANU"));
+                    tickets.push_back(make_pair("AXA","TIA"));
+                    tickets.push_back(make_pair("TIA","JFK"));
+                    tickets.push_back(make_pair("ANU","TIA"));
+                    tickets.push_back(make_pair("JFK","TIA"));
+                    break;
+                }
+            default:
+                cout << "invalid test case" << endl;
+        }
 
     Solution sln;
     vector<string> vecItinerary = sln.findItinerary(tickets);
@@ -240,7 +286,8 @@ int main(int argc, char** argv)
 }
 
 /*
-Status: wrong answer
+TBD: Need to improve as my performance is poor (beating < 1% of submissions in Leetcode).
+
 Had faced similar issue (comparison functor can't access the variables in the class under which it is nested)
     http://stackoverflow.com/questions/27101829/c-invalid-use-of-non-static-data-member
 
