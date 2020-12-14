@@ -68,7 +68,7 @@ class LeetCode:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--html_file", action="store", default="C:/KA/(2) Problems - LeetCode.html", dest="html_file")
-    parser.add_argument("--cpp_dir", action="store", default="./", dest="cpp_dir")
+    parser.add_argument("--cpp_dir", action="store", default="./src/", dest="cpp_dir")
     args = parser.parse_args()
 
     print("args: {}".format(args))
