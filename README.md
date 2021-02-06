@@ -3,7 +3,7 @@ LeetCode - Online Programming
 
 ### Profile
 
-https://leetcode.com/kaushik_acharya/
+- [kaushik_acharya](https://leetcode.com/kaushik_acharya/)
 
 ### Algorithm Problems' Solutions
 
@@ -118,3 +118,6 @@ https://leetcode.com/kaushik_acharya/
 |486|[Predict the Winner](https://leetcode.com/problems/predict-the-winner)|[C++](./src/predict_the_winner.cpp)|
 |508|[Most Frequent Subtree Sum](https://leetcode.com/problems/most-frequent-subtree-sum)|[C++](./src/most_frequent_subtree_sum.cpp)|
 |513|[Find Bottom Left Tree Value](https://leetcode.com/problems/find-bottom-left-tree-value)|[C++](./src/find_bottom_left_tree_value.cpp)|
+
+#### Related Repositories
+- [binarysearch](https://github.com/kaushikacharya/binarysearch)
