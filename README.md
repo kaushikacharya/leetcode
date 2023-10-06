@@ -1,24 +1,29 @@
-LeetCode - Online Programming
-=============================
+# LeetCode - Online Programming
 
-### Profile
+## Profile
 
 - [kaushik_acharya](https://leetcode.com/kaushik_acharya/)
 
-### Unit Test Framework
+## Unit Test Framework
 
 - [lest](https://github.com/martinmoene/lest)
 
-### Algorithm Problems' Solutions
+## Space Complexity Definition
 
-| # | Problem | Solution | Unit Tests |
-|---|---------|----------|------------|
+- Convention followed in this repository:
+  - Only the additional space used by the algorithm is considered for space complexity.
+  - Space used by the input has been ignored.
+
+## Algorithm Problems' Solutions
+
+| # | Problem | Solution | Unit Tests |Time Complexity|Space Complexity|
+|---|---------|----------|------------|---------------|----------------|
 |2|[Add Two Numbers](https://leetcode.com/problems/add-two-numbers)|[C++](./src/add_two_numbers.cpp)|
 |3|[Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters)|[C++](./src/longest_substring_without_repeating_characters.cpp)|
 |15|[3Sum](https://leetcode.com/problems/3sum)|[C++](./src/3sum.cpp)|
 |16|[3Sum Closest](https://leetcode.com/problems/3sum-closest)|[C++](./src/3sum_closest.cpp)|
 |17|[Letter Combinations of a Phone Number](https://leetcode.com/problems/letter-combinations-of-a-phone-number)|[C++](./src/letter_combinations_of_phone_number.cpp)|
-|19|[Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/)|[C++](./src/remove_nth_node_from_end_of_list.cpp)|Y|
+|19|[Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/)|[C++](./src/remove_nth_node_from_end_of_list.cpp)|Y|O(n)|O(1)|
 |21|[Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists)|[C++](./src/merge_two_sorted_lists.cpp)|
 |22|[Generate Parentheses](https://leetcode.com/problems/generate-parentheses)|[C++](./src/generate_parentheses.cpp)|
 |23|[Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists)|[C++](./src/merge_k_sorted_lists.cpp)|
@@ -96,7 +101,7 @@ LeetCode - Online Programming
 |198|[House Robber](https://leetcode.com/problems/house-robber)|[C++](./src/house_robber.cpp)|
 |199|[Binary Tree Right Side View](https://leetcode.com/problems/binary-tree-right-side-view)|[C++](./src/binary_tree_right_side_view.cpp)|
 |200|[Number of Islands](https://leetcode.com/problems/number-of-islands)|[C++](./src/number_of_islands.cpp)|
-|206|[Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/description/)|[C++](./src/reverse_linked_list.cpp)|Y
+|206|[Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/description/)|[C++](./src/reverse_linked_list.cpp)|Y|O(n)|O(1)|
 |207|[Course Schedule](https://leetcode.com/problems/course-schedule)|[C++](./src/course_schedule.cpp)|
 |209|[Minimum Size Subarray Sum](https://leetcode.com/problems/minimum-size-subarray-sum)|[C++](./src/minimum_size_subarray_sum.cpp)|
 |215|[Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array)|[C++](./src/kth_largest_element_in_array.cpp)|
@@ -105,6 +110,7 @@ LeetCode - Online Programming
 |230|[Kth Smallest Element in a BST](https://leetcode.com/problems/kth-smallest-element-in-a-bst)|[C++](./src/kth_smallest_element_in_bst.cpp)|
 |232|[Implement Queue using Stacks](https://leetcode.com/problems/implement-queue-using-stacks)|[C++](./src/implement_queue_using_stacks.cpp)|
 |233|[Number of Digit One](https://leetcode.com/problems/number-of-digit-one)|[C++](./src/number_of_digit_one.cpp)|
+|234|[Palindrome Linked List](https://leetcode.com/problems/palindrome-linked-list/)|[C++](./src/palindrome_linked_list.cpp)|Y|||
 |240|[Search a 2D Matrix II](https://leetcode.com/problems/search-a-2d-matrix-ii)|[C++](./src/search_a_2d_matrix_ii.cpp)|
 |241|[Different Ways to Add Parentheses](https://leetcode.com/problems/different-ways-to-add-parentheses)|[C++](./src/different_ways_to_add_parentheses.cpp)|
 |268|[Missing Number](https://leetcode.com/problems/missing-number)|[C++](./src/missing_number.cpp)|
@@ -126,5 +132,6 @@ LeetCode - Online Programming
 |508|[Most Frequent Subtree Sum](https://leetcode.com/problems/most-frequent-subtree-sum)|[C++](./src/most_frequent_subtree_sum.cpp)|
 |513|[Find Bottom Left Tree Value](https://leetcode.com/problems/find-bottom-left-tree-value)|[C++](./src/find_bottom_left_tree_value.cpp)|
 
-#### Related Repositories
+## Related Repositories
+
 - [binarysearch](https://github.com/kaushikacharya/binarysearch)
